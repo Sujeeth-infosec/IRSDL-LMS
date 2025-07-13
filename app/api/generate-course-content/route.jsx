@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ai } from "../generate-course-content/route";
+import { ai } from "../generate-course-layout/route";
 
 const PROMPT = `Depends on Chapter name and Topic Generate content for each topic in HTML and give response in JSON format.
 Schema:{
