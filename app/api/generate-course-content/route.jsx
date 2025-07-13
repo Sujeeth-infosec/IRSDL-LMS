@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ai } from "../generate-course-content/route.jsx";
+import { ai } from "../generate-course-content/route";
 
 const PROMPT = `Depends on Chapter name and Topic Generate content for each topic in HTML and give response in JSON format.
 Schema:{
@@ -36,9 +36,9 @@ export async function POST(req) {
       config,
       contents,
     });
+    console.log(response.candidates[0].content.parts[0].text);
     const RawResp = response.candidates[0].content.parts[0].text;
-    console.log(RawResp);
-    const RawJson = RawResp.replace("```json", "").replace("```", "");
+    const RawJson = RawResp.replace('```json', '').replace('```', '');
     const JSONResp = JSON.parse(RawJson);
 
     //Get Youtube videos

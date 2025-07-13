@@ -36,13 +36,14 @@ Schema:
 
 `;
 
+export const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY,
+  });
+
 export async function POST(req) {
   const { courseId, ...formData } = await req.json();
   const user = await currentUser();
 
-  const ai = new GoogleGenAI({
-    apiKey: process.env.GEMINI_API_KEY,
-  });
   const tools = [
     {
       googleSearch: {},
@@ -74,11 +75,10 @@ export async function POST(req) {
   const RawJson = RawResp.replace("```json", "").replace("```", "");
   const JSONResp = JSON.parse(RawJson);
 
-  const ImagePrompt=JSONResp.course?.bannerImagePrompt;
-
+  const ImagePrompt = JSONResp.course?.bannerImagePrompt;
 
   //Generate Image for course Thumbnail
-  const bannerImageUrl= await GenerateImage(ImagePrompt)
+  const bannerImageUrl = await GenerateImage(ImagePrompt);
 
   //save to database
   const result = await db.insert(coursesTable).values({
@@ -86,29 +86,30 @@ export async function POST(req) {
     courseJson: JSONResp,
     userEmail: user?.primaryEmailAddress?.emailAddress,
     cid: courseId,
-    bannerImageUrl:bannerImageUrl
+    bannerImageUrl: bannerImageUrl,
   });
 
   return NextResponse.json({ courseId: courseId });
 }
 
-
-const GenerateImage=async(ImagePrompt)=>{
-    const BASE_URL='https://aigurulab.tech';
-const result = await axios.post(BASE_URL+'/api/generate-image',
-        {
-            width: 1024,
-            height: 1024,
-            input: ImagePrompt,
-            model: 'flux',//'flux'
-            aspectRatio:"16:9"//Applicable to Flux model only
-        },
-        {
-            headers: {
-                'x-api-key': process?.env?.AI_GURU_LAB_API, // Your API Key
-                'Content-Type': 'application/json', // Content Type
-            },
-        })
-console.log(result.data.image) //Output Result: Base 64 Image
-return result.data.image
-}
+const GenerateImage = async (ImagePrompt) => {
+  const BASE_URL = "https://aigurulab.tech";
+  const result = await axios.post(
+    BASE_URL + "/api/generate-image",
+    {
+      width: 1024,
+      height: 1024,
+      input: ImagePrompt,
+      model: "flux", //'flux'
+      aspectRatio: "16:9", //Applicable to Flux model only
+    },
+    {
+      headers: {
+        "x-api-key": process?.env?.AI_GURU_LAB_API, // Your API Key
+        "Content-Type": "application/json", // Content Type
+      },
+    }
+  );
+  console.log(result.data.image); //Output Result: Base 64 Image
+  return result.data.image;
+};
