@@ -23,7 +23,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import AddNewCourseDialog from "../AddNewCourseDialog";
+import AddNewCourseDialog from "./AddNewCourseDialog";
 
 const SideBarOptions = [
   {
