@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { ai } from "../generate-course-layout/route";
 import axios from "axios";
+import { db } from "@/config/db";
+import { coursesTable } from "@/config/schema";
+import { eq } from "drizzle-orm";
 
 const PROMPT = `Depends on Chapter name and Topic Generate content for each topic in HTML and give response in JSON format (Avoid without numbering or metadata like [5]).
 Schema:{
@@ -44,11 +47,11 @@ export async function POST(req) {
 
     //Get Youtube videos
 
-    const youtubeData = await GetYoutubeVideo(chapter?.chaptername);
+    const youtubeData = await GetYoutubeVideo(chapter?.chapterName);
     console.log({
       youtubeVideo: youtubeData,
       CourseData: JSONResp,
-    })
+    });
     return {
       youtubeVideo: youtubeData,
       CourseData: JSONResp,
@@ -56,6 +59,14 @@ export async function POST(req) {
   });
 
   const CourseContent = await Promise.all(promises);
+
+  //Save to DB
+  const dbResp = await db
+    .update(coursesTable)
+    .set({
+      courseContent: CourseContent,
+    })
+    .where(eq(coursesTable.cid, courseId));
 
   return NextResponse.json({
     courseName: courseTitle,
